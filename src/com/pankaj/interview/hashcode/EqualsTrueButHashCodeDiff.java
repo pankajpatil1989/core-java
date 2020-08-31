@@ -1,4 +1,4 @@
-package com.pankaj.interview.hascode;
+package com.pankaj.interview.hashcode;
 
 
 import java.math.BigDecimal;
