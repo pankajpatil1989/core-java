@@ -22,6 +22,11 @@ public class CustomObjListSorting {
 //        employees.add(new Employee(1, "Pankaj", 32, 50000));
 
         //sorting employees array using Comparable interface implementation
+        // Comparator using lambda expression
+        Comparator<Employee> salaryComparator = ((e1,e2) -> (int) (e1.getSalary() - e2.getSalary()));
+        employees.sort(salaryComparator);
+        employees.forEach(emp -> System.out.println(emp));
+
         Collections.sort(employees);
         System.out.println("Default Sorting of Employees list:");
         employees.forEach(emp -> System.out.println(emp));

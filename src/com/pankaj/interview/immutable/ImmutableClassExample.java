@@ -3,7 +3,10 @@ package com.pankaj.interview.immutable;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 // 1. Declare your class as final, So other classes can't extend it and break its immutability
 final class MyImmutableClass {
@@ -14,13 +17,17 @@ final class MyImmutableClass {
     private final int id;
     private final String name;
     private final Date dob;
+    private ArrayList<String> list;
 
     // 4. Create an constructor with argument so you can assign instantiate your object with a proper state
-    public MyImmutableClass(int id, String name, Date dob) {
+    public MyImmutableClass(int id, String name, Date dob, ArrayList<String> list) {
         this.id = id;
         this.name = name;
         // 5. Initialise all your fields by deeply copying them if they are not immutable in nature
         this.dob = new Date(dob.getTime());
+
+        this.list = (ArrayList<String>) list.clone();
+
         //this line prevent it form serialization and reflection
         System.setSecurityManager(new SecurityManager());
     }
@@ -39,15 +46,19 @@ final class MyImmutableClass {
         return new Date(dob.getTime());
     }
 
+    public ArrayList<String> getList() {
+        return (ArrayList<String>) list.clone();
+    }
+
     @Override
     public String toString() {
-        return "ImmutableEmployee{" +
+        return "MyImmutableClass{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", dob=" + dob +
+                ", list=" + list +
                 '}';
     }
-
 }
 
 public class ImmutableClassExample {
@@ -55,10 +66,17 @@ public class ImmutableClassExample {
 
     public static void main(String[] args) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ParseException {
         Date dob = new SimpleDateFormat("dd-mm-yyyy").parse("10-12-1993");
-        MyImmutableClass employee = new MyImmutableClass(1, "Naresh", dob);
+        ArrayList<String> list =new ArrayList<>();
+        list.add("abc");
+        list.add("xyz");
+        MyImmutableClass employee = new MyImmutableClass(1, "Naresh", dob,list);
+        // even "pqr" is added in list its not added to actual employee object.
+        employee.getList().add("pqr");
 
         System.out.println(employee);
-        // Prints - ImmutableEmployee{id=1, name='Naresh', dob=Sun Jan 10 00:12:00 IST 1993}
+        // MyImmutableClass{id=1, name='Naresh', dob=Sun Jan 10 00:12:00 IST 1993, list=[abc, xyz]}
+
+
 
         dob.setMonth(1);
         System.out.println(dob);
@@ -72,7 +90,7 @@ public class ImmutableClassExample {
         System.out.println(employee.getDob());
         // Prints - Sun Jan 10 00:12:00 IST 1993
         System.out.println(employee);
-        // Prints - ImmutableEmployee{id=1, name='Naresh', dob=Sun Jan 10 00:12:00 IST 1993}
+        // MyImmutableClass{id=1, name='Naresh', dob=Sun Jan 10 00:12:00 IST 1993, list=[abc, xyz]}
 
         // Let's get class and use reflection to modify private fields...
         Class<?> muttableClass = employee.getClass();
@@ -91,7 +109,7 @@ public class ImmutableClassExample {
         // After Change
         System.out.println("\n---IMMUTABLE OBJECT AFTER---");
         System.out.println(employee);
-        // ImmutableEmployee{id=12345, name='Pankaj', dob=Sun Jan 10 00:12:00 IST 1993}\
+        // MyImmutableClass{id=1, name='Naresh', dob=Sun Jan 10 00:12:00 IST 1993, list=[abc, xyz]}
 
         // Using Reflection break immutability
         // If we not add below line in constructor
